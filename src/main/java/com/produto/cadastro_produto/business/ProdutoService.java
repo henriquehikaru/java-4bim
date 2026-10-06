@@ -26,4 +26,16 @@ public class ProdutoService {
         repository.deleteById(id);
     }
 
+    public void atualizarProdutoPorId(Integer id, Produto produto) {
+        Produto produtoEntity = repository.findById(id).orElseThrow(() ->
+                new RuntimeException("Produto não encontrado"));
+        Produto produtoAtualizado = Produto.builder()
+                .id(produto.getId())
+                .descricao(produto.getDescricao() != null ? produto.getDescricao() : produtoEntity.getDescricao())
+                .categoria(produto.getCategoria() != null ? produto.getCategoria() : produtoEntity.getCategoria())
+                .build();
+
+        repository.saveAndFlush(produtoAtualizado);
+    }
+
 }
