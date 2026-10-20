@@ -16,14 +16,14 @@ public class ProdutoService {
         repository.saveAndFlush(produto);
     }
 
-    public Produto buscarProdutoPorId(Integer id) {
-        return repository.findById(id).orElseThrow(
+    public Produto buscarProdutoPorDescricao(String descricao) {
+        return repository.findByDescricao(descricao).orElseThrow(
                 () -> new RuntimeException("Produto não encontrado")
         );
     }
 
-    public void deletarProdutoPorId(Integer id) {
-        repository.deleteById(id);
+    public void deletarProdutoPorDescricao(String descricao) {
+        repository.deleteByDescricao(descricao);
     }
 
     public void atualizarProdutoPorId(Integer id, Produto produto) {

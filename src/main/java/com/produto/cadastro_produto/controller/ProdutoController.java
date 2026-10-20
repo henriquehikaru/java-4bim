@@ -14,8 +14,8 @@ public class ProdutoController {
     private final ProdutoService produtoService;
 
     @DeleteMapping
-    public ResponseEntity<Void> deletarPorId(@RequestParam Integer id){
-        produtoService.deletarProdutoPorId(id);
+    public ResponseEntity<Void> deletarPorDescricao(@RequestParam String descricao){
+        produtoService.deletarProdutoPorDescricao(descricao);
         return ResponseEntity.ok().build();
     }
 
@@ -26,8 +26,8 @@ public class ProdutoController {
     }
 
     @GetMapping
-    public ResponseEntity<Produto> buscarProdutoPorId(@RequestParam Integer id){
-        return ResponseEntity.ok(produtoService.buscarProdutoPorId(id));
+    public ResponseEntity<Produto> buscarProdutoPorDescricao(@RequestParam String descricao){
+        return ResponseEntity.ok(produtoService.buscarProdutoPorDescricao(descricao));
     }
 
     @PutMapping
