@@ -30,9 +30,10 @@ public class ProdutoService {
         Produto produtoEntity = repository.findById(id).orElseThrow(() ->
                 new RuntimeException("Produto não encontrado"));
         Produto produtoAtualizado = Produto.builder()
-                .id(produto.getId())
+                .id(id)
                 .descricao(produto.getDescricao() != null ? produto.getDescricao() : produtoEntity.getDescricao())
                 .categoria(produto.getCategoria() != null ? produto.getCategoria() : produtoEntity.getCategoria())
+                .preco(produto.getPreco() != null ? produto.getPreco() : produtoEntity.getPreco())
                 .build();
 
         repository.saveAndFlush(produtoAtualizado);
