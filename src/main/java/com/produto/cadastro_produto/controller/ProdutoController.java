@@ -20,7 +20,7 @@ public class ProdutoController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> salvarProdutoPorId(@RequestBody Produto produto){
+    public ResponseEntity<Void> salvarProduto(@RequestBody Produto produto){
         produtoService.salvarProduto(produto);
         return ResponseEntity.ok().build();
     }
