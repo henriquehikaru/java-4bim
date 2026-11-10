@@ -2,89 +2,557 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Cadastro de Produto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gestão Comercial | Produtos</title>
+    <link rel="icon" href="data:,">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<h1>Cadastro de Produto</h1>
 
-<!-- Criar produto -->
-<h2>Criar</h2>
-<input type="text" id="nome" placeholder="Nome">
-<input type="number" id="preco" placeholder="Preço" step="0.01">
-<button onclick="criar()">Salvar</button>
+<!-- Ícones reutilizáveis (SVG inline, sem dependências externas) -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="i-terminal" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></symbol>
+    <symbol id="i-dollar" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-cart" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></symbol>
+</svg>
 
-<hr>
+<div class="app">
 
-<!-- Buscar produto -->
-<h2>Buscar</h2>
-<input type="number" id="buscarId" placeholder="ID">
-<button onclick="buscar()">Buscar</button>
-<pre id="resultadoBuscar"></pre>
+    <!-- Menu lateral -->
+    <aside class="sidebar">
+        <div class="marca">
+            <span class="marca-logo"><svg class="icon"><use href="#i-box"/></svg></span>
+            <div>
+                <strong>Gestão Comercial</strong>
+                <small>Painel administrativo</small>
+            </div>
+        </div>
 
-<hr>
+        <nav class="menu" aria-label="Menu principal">
+            <span class="menu-titulo">Cadastros</span>
+            <span class="menu-item ativo" aria-current="page"><svg class="icon"><use href="#i-box"/></svg>Produtos</span>
+            <span class="menu-item desabilitado" aria-disabled="true"><svg class="icon"><use href="#i-users"/></svg>Clientes<em class="tag">em breve</em></span>
+            <span class="menu-titulo">Operações</span>
+            <span class="menu-item desabilitado" aria-disabled="true"><svg class="icon"><use href="#i-cart"/></svg>Vendas<em class="tag">em breve</em></span>
+            <span class="menu-item desabilitado" aria-disabled="true"><svg class="icon"><use href="#i-layers"/></svg>Estoque<em class="tag">em breve</em></span>
+        </nav>
+    </aside>
 
-<!-- Deletar produto -->
-<h2>Deletar</h2>
-<input type="number" id="deletarId" placeholder="ID">
-<button onclick="deletar()">Deletar</button>
+    <!-- Conteúdo principal -->
+    <main class="conteudo">
 
-<hr>
+        <header class="cabecalho">
+            <div>
+                <p class="breadcrumb">Cadastros <span>/</span> Produtos</p>
+                <h1>Produtos</h1>
+                <p class="subtitulo">Cadastre, consulte, atualize e exclua os produtos da empresa.</p>
+            </div>
+            <div class="cabecalho-acoes">
+                <span class="status-api" id="statusApi" data-estado="aguardando">
+                    <span class="ponto"></span><span id="statusApiTexto">Aguardando requisições</span>
+                </span>
+                <button class="btn btn-primary" id="btnNovo" type="button">
+                    <svg class="icon"><use href="#i-plus"/></svg>Novo produto
+                </button>
+            </div>
+        </header>
 
-<!-- Atualizar produto -->
-<h2>Atualizar</h2>
-<input type="number" id="id" placeholder="ID">
-<input type="text" id="novoNome" placeholder="Novo Nome">
-<input type="number" id="novoPreco" placeholder="Novo Preço" step="0.01">
-<button onclick="atualizar()">Atualizar</button>
+        <!-- Indicadores calculados a partir dos produtos exibidos na tabela -->
+        <section class="kpis" aria-label="Resumo dos produtos exibidos">
+            <article class="kpi">
+                <span class="kpi-icone azul"><svg class="icon"><use href="#i-box"/></svg></span>
+                <div><p>Produtos exibidos</p><strong id="kpiTotal">0</strong></div>
+            </article>
+            <article class="kpi">
+                <span class="kpi-icone verde"><svg class="icon"><use href="#i-dollar"/></svg></span>
+                <div><p>Preço médio</p><strong id="kpiMedia">—</strong></div>
+            </article>
+            <article class="kpi">
+                <span class="kpi-icone ambar"><svg class="icon"><use href="#i-trend"/></svg></span>
+                <div><p>Maior preço</p><strong id="kpiMaior">—</strong></div>
+            </article>
+        </section>
+
+        <!-- Busca + tabela -->
+        <section class="card">
+            <div class="toolbar">
+                <form id="formBusca" class="busca" novalidate>
+                    <label class="sr-only" for="buscarDescricao">Buscar produto pela descrição</label>
+                    <div class="input-icon">
+                        <svg class="icon"><use href="#i-search"/></svg>
+                        <input id="buscarDescricao" type="text" maxlength="100" placeholder="Buscar produto pela descrição" autocomplete="off">
+                    </div>
+                    <button class="btn btn-ghost" type="submit" id="btnBuscar">Buscar</button>
+                </form>
+            </div>
+
+            <div class="aviso" id="avisoLista" hidden>
+                O backend busca e exclui produtos pela descrição (<code>GET</code> e <code>DELETE /produto?descricao=</code>)
+                e não tem rota de listagem. A tabela mostra os produtos cadastrados ou consultados nesta sessão.
+            </div>
+
+            <div class="filtro" id="filtroAtivo" hidden>
+                <span id="filtroTexto"></span>
+                <button class="btn-link" id="btnLimparFiltro" type="button">Limpar filtro</button>
+            </div>
+
+            <div class="tabela-wrap" id="tabelaWrap">
+                <table>
+                    <caption class="sr-only">Produtos cadastrados ou consultados nesta sessão</caption>
+                    <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Descrição</th>
+                        <th scope="col" class="col-preco">Preço</th>
+                        <th scope="col" class="col-acoes">Ações</th>
+                    </tr>
+                    </thead>
+                    <tbody id="tabelaCorpo"></tbody>
+                </table>
+            </div>
+
+            <div class="vazio" id="vazio" hidden>
+                <span class="vazio-icone"><svg class="icon"><use href="#i-box"/></svg></span>
+                <h3>Nenhum produto para exibir</h3>
+                <p>Cadastre um produto em “Novo produto” ou busque pela descrição para exibi-lo aqui.</p>
+            </div>
+        </section>
+
+        <!-- Console das requisições HTTP (útil para explicar a integração) -->
+        <section class="card log" aria-label="Console de requisições HTTP">
+            <div class="log-cabecalho">
+                <h2><svg class="icon"><use href="#i-terminal"/></svg>Console de requisições HTTP</h2>
+                <button class="btn-link" id="btnLimparLog" type="button">Limpar</button>
+            </div>
+            <p class="log-vazio" id="logVazio">Nenhuma requisição ainda. Cada chamada ao backend aparecerá aqui.</p>
+            <ul id="logLista"></ul>
+        </section>
+    </main>
+</div>
+
+<!-- Modal: criar / editar produto -->
+<dialog id="modalProduto" aria-labelledby="modalProdutoTitulo">
+    <form id="formProduto" novalidate>
+        <div class="modal-head">
+            <h2 id="modalProdutoTitulo">Novo produto</h2>
+            <button type="button" class="icon-btn" data-fechar aria-label="Fechar"><svg class="icon"><use href="#i-x"/></svg></button>
+        </div>
+        <div class="modal-body">
+            <div class="campo" id="campoId" hidden>
+                <label for="produtoId">Código (ID)</label>
+                <input id="produtoId" type="text" readonly>
+            </div>
+            <div class="campo" id="campoDescricao">
+                <label for="produtoDescricao">Descrição do produto</label>
+                <input id="produtoDescricao" type="text" maxlength="100" placeholder="Ex.: Teclado mecânico" autocomplete="off">
+                <small class="erro" id="erroDescricao"></small>
+            </div>
+            <div class="campo" id="campoPreco">
+                <label for="produtoPreco">Preço (R$)</label>
+                <input id="produtoPreco" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00">
+                <small class="erro" id="erroPreco"></small>
+            </div>
+            <p class="alerta-modal" id="erroProduto" role="alert" hidden></p>
+        </div>
+        <div class="modal-foot">
+            <button type="button" class="btn btn-ghost" data-fechar>Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btnSalvar">Salvar</button>
+        </div>
+    </form>
+</dialog>
+
+<!-- Modal: confirmar exclusão -->
+<dialog id="modalExcluir" aria-labelledby="modalExcluirTitulo">
+    <div class="modal-body confirm">
+        <span class="confirm-icone"><svg class="icon"><use href="#i-trash"/></svg></span>
+        <h2 id="modalExcluirTitulo">Excluir produto?</h2>
+        <p>Você está prestes a excluir <strong id="excluirDescricao"></strong>.
+            Esta ação não pode ser desfeita.</p>
+        <p class="alerta-modal" id="erroExcluir" role="alert" hidden></p>
+    </div>
+    <div class="modal-foot">
+        <button type="button" class="btn btn-ghost" data-fechar>Cancelar</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmarExcluir">Excluir</button>
+    </div>
+</dialog>
+
+<!-- Avisos rápidos -->
+<div class="toasts" id="toasts" aria-live="polite"></div>
 
 <script>
-    const api = "/produto";
+    "use strict";
 
-    async function criar() {
-        const resp = await fetch(api, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                nome: document.getElementById("nome").value,
-                preco: parseFloat(document.getElementById("preco").value)
-            })
-        });
-        alert(resp.ok ? "Produto criado!" : "Erro ao criar!");
+    /* ===================== Configuração ===================== */
+    // Endereço do recurso no backend Java (Spring). É um caminho relativo porque o
+    // index.html é servido pelo próprio backend (mesma origem), sem problema de CORS.
+    //
+    // Endpoints do ProdutoController:
+    //   POST   /produto                 -> cadastra (corpo JSON do produto)
+    //   GET    /produto?descricao=X     -> busca um produto pela descrição
+    //   PUT    /produto?id=N            -> atualiza (corpo JSON); o ID só é usado aqui
+    //   DELETE /produto?descricao=X     -> exclui pela descrição
+    const API = "/produto";
+    const MSG_SEM_SERVIDOR = "Sem resposta do servidor. Verifique se o backend Java está rodando.";
+    const moeda = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+
+    /* ===================== Estado da tela ===================== */
+    // O backend não tem rota de listagem, então a tabela mostra os produtos
+    // cadastrados ou consultados nesta sessão.
+    const sessao = new Map();        // chave -> produto
+    let resultadoBusca = null;       // { termo, produto } enquanto uma busca filtra a tabela
+    let produtoEmEdicao = null;      // null = criando; objeto = editando
+    let produtoParaExcluir = null;
+    const historico = [];            // últimas requisições (console da tela)
+
+    const $ = (id) => document.getElementById(id);
+
+    function el(tag, classe, texto) {
+        const e = document.createElement(tag);
+        if (classe) e.className = classe;
+        if (texto !== undefined) e.textContent = texto;
+        return e;
     }
 
-    async function buscar() {
-        const id = document.getElementById("buscarId").value;
-        const resultado = document.getElementById("resultadoBuscar");
-        const resp = await fetch(`${api}?id=${encodeURIComponent(id)}`);
-        if (resp.ok) {
+    const temId = (p) => p.id !== undefined && p.id !== null;
+    const urlPorDescricao = (descricao) => `${API}?descricao=${encodeURIComponent(descricao)}`;
+
+    /* ===================== Comunicação com o backend ===================== */
+    // Função única para falar com o backend: monta a requisição HTTP com fetch(),
+    // envia o corpo em JSON quando existe e devolve { ok, status, dados }.
+    async function requisicao(metodo, url, corpo) {
+        const opcoes = { method: metodo, headers: {} };
+        let corpoTexto = "";
+        if (corpo !== undefined) {
+            corpoTexto = JSON.stringify(corpo);              // objeto JS -> texto JSON
+            opcoes.headers["Content-Type"] = "application/json";
+            opcoes.body = corpoTexto;
+        }
+        const inicio = performance.now();
+        try {
+            const resp = await fetch(url, opcoes);
             const texto = await resp.text();
-            resultado.innerText = texto
-                ? JSON.stringify(JSON.parse(texto), null, 2)
-                : "Produto não encontrado!";
-        } else {
-            resultado.innerText = "Produto não encontrado!";
+            let dados = null;
+            if (texto) {
+                try { dados = JSON.parse(texto); } catch { dados = texto; }   // texto JSON -> objeto JS
+            }
+            registrarLog(metodo, url, corpoTexto, resp.status, Math.round(performance.now() - inicio));
+            definirStatusApi(true);
+            return { ok: resp.ok, status: resp.status, dados };
+        } catch (erro) {
+            registrarLog(metodo, url, corpoTexto, 0, Math.round(performance.now() - inicio));
+            definirStatusApi(false);
+            return { ok: false, status: 0, dados: null };
         }
     }
 
-    async function deletar() {
-        const id = document.getElementById("deletarId").value;
-        const resp = await fetch(`${api}?id=${encodeURIComponent(id)}`, { method: "DELETE" });
-        alert(resp.ok ? "Produto deletado!" : "Erro ao deletar!");
+    // Extrai o produto de uma resposta de GET (resposta vazia ou erro = não encontrado)
+    function extrairProduto(r) {
+        if (!r.ok || !r.dados || typeof r.dados !== "object") return null;
+        return Array.isArray(r.dados) ? (r.dados[0] ?? null) : r.dados;
     }
 
-    async function atualizar() {
-        const id = document.getElementById("id").value;
-        const resp = await fetch(`${api}?id=${encodeURIComponent(id)}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                nome: document.getElementById("novoNome").value,
-                preco: parseFloat(document.getElementById("novoPreco").value)
-            })
-        });
-        alert(resp.ok ? "Produto atualizado!" : "Erro ao atualizar!");
+    // GET /produto?descricao=X  -> busca um produto pela descrição
+    async function buscarPorDescricao(evento) {
+        evento.preventDefault();
+        const termo = $("buscarDescricao").value.trim();
+        if (termo === "") { toast("Informe a descrição do produto para buscar.", "aviso"); return; }
+
+        $("btnBuscar").disabled = true;
+        try {
+            const r = await requisicao("GET", urlPorDescricao(termo));
+            if (r.status === 0) return toast(MSG_SEM_SERVIDOR, "erro");
+
+            const produto = extrairProduto(r);
+            if (!produto) return toast(`Nenhum produto encontrado com a descrição “${termo}”.`, "aviso");
+
+            guardarNaSessao(produto);
+            resultadoBusca = { termo, produto };
+            renderizar();
+        } finally {
+            $("btnBuscar").disabled = false;
+        }
     }
+
+    // POST /produto        (cria)      corpo: { descricao, preco }
+    // PUT  /produto?id=N   (atualiza)  corpo: { descricao, preco }
+    async function salvarProduto(evento) {
+        evento.preventDefault();
+        limparErrosFormulario();
+        const descricao = $("produtoDescricao").value.trim();
+        const preco = parseFloat($("produtoPreco").value);
+        if (!validarFormulario(descricao, preco)) return;
+
+        const editando = produtoEmEdicao !== null;
+        const dados = { descricao, preco };
+        const metodo = editando ? "PUT" : "POST";
+        const url = editando ? `${API}?id=${encodeURIComponent(produtoEmEdicao.id)}` : API;
+
+        $("btnSalvar").disabled = true;
+        try {
+            const r = await requisicao(metodo, url, dados);
+            if (r.status === 0) return mostrarErro("erroProduto", MSG_SEM_SERVIDOR);
+            if (!r.ok) return mostrarErro("erroProduto", editando ? "Erro ao atualizar o produto." : "Erro ao cadastrar o produto.");
+
+            if (editando) {
+                // O PUT responde 200 sem corpo: atualizamos a linha com o que foi enviado
+                const atualizado = { ...produtoEmEdicao, ...dados };
+                guardarNaSessao(atualizado);
+                if (resultadoBusca && resultadoBusca.produto.id === produtoEmEdicao.id) {
+                    resultadoBusca.produto = atualizado;
+                }
+            } else {
+                // O POST também responde 200 sem corpo. Para obter o ID gerado pelo banco,
+                // consultamos o produto recém-criado pela descrição.
+                const busca = await requisicao("GET", urlPorDescricao(descricao));
+                guardarNaSessao(extrairProduto(busca) ?? dados);
+                resultadoBusca = null;
+            }
+
+            $("modalProduto").close();
+            toast(editando ? "Produto atualizado com sucesso!" : "Produto cadastrado com sucesso!");
+            renderizar();
+        } finally {
+            $("btnSalvar").disabled = false;
+        }
+    }
+
+    // DELETE /produto?descricao=X  (exclui pela descrição)
+    async function confirmarExclusao() {
+        if (!produtoParaExcluir) return;
+        const descricao = produtoParaExcluir.descricao;
+
+        $("btnConfirmarExcluir").disabled = true;
+        try {
+            const r = await requisicao("DELETE", urlPorDescricao(descricao));
+            if (r.status === 0) return mostrarErro("erroExcluir", MSG_SEM_SERVIDOR);
+            if (!r.ok) return mostrarErro("erroExcluir", "Erro ao excluir o produto.");
+
+            removerDaSessao(descricao);
+            if (resultadoBusca && resultadoBusca.produto.descricao === descricao) resultadoBusca = null;
+
+            $("modalExcluir").close();
+            toast("Produto excluído com sucesso!");
+            renderizar();
+        } finally {
+            $("btnConfirmarExcluir").disabled = false;
+        }
+    }
+
+    /* ===================== Produtos da sessão ===================== */
+    // Produtos com ID são identificados por ele; sem ID, pela descrição.
+    function chaveDe(p) {
+        return temId(p) ? `id:${p.id}` : `desc:${p.descricao}`;
+    }
+
+    function guardarNaSessao(p) {
+        if (!p || typeof p !== "object") return;
+        if (temId(p)) sessao.delete(`desc:${p.descricao}`);   // já temos o ID: descarta a versão sem ID
+        sessao.delete(chaveDe(p));                            // reinsere para ficar no topo da tabela
+        sessao.set(chaveDe(p), p);
+    }
+
+    function removerDaSessao(descricao) {
+        for (const [chave, p] of sessao) {
+            if (p.descricao === descricao) sessao.delete(chave);
+        }
+    }
+
+    /* ===================== Renderização ===================== */
+    function formatarPreco(valor) {
+        const n = Number(valor);
+        return Number.isFinite(n) ? moeda.format(n) : "—";
+    }
+
+    function renderizar() {
+        const lista = resultadoBusca ? [resultadoBusca.produto] : [...sessao.values()].reverse();
+
+        // Linhas da tabela
+        const corpo = $("tabelaCorpo");
+        corpo.replaceChildren();
+        lista.forEach((p) => {
+            const tr = el("tr");
+
+            const tdId = el("td");
+            tdId.appendChild(el("span", "badge-id", temId(p) ? `#${p.id}` : "—"));
+
+            const tdDescricao = el("td", "col-nome", p.descricao ?? "—");
+            const tdPreco = el("td", "col-preco", formatarPreco(p.preco));
+
+            const tdAcoes = el("td", "col-acoes");
+            const grupo = el("div", "acoes");
+            grupo.append(
+                botaoAcao("i-edit", "editar",
+                    temId(p) ? `Editar ${p.descricao}` : "Para editar, busque o produto pela descrição (o ID é necessário)",
+                    () => abrirEdicao(p), !temId(p)),
+                botaoAcao("i-trash", "excluir", `Excluir ${p.descricao}`, () => abrirExclusao(p))
+            );
+            tdAcoes.appendChild(grupo);
+
+            tr.append(tdId, tdDescricao, tdPreco, tdAcoes);
+            corpo.appendChild(tr);
+        });
+
+        // Indicadores
+        const precos = lista.map((p) => Number(p.preco)).filter(Number.isFinite);
+        $("kpiTotal").textContent = lista.length;
+        $("kpiMedia").textContent = precos.length ? moeda.format(precos.reduce((a, b) => a + b, 0) / precos.length) : "—";
+        $("kpiMaior").textContent = precos.length ? moeda.format(Math.max(...precos)) : "—";
+
+        // Estados da tela
+        const vazio = lista.length === 0;
+        $("tabelaWrap").hidden = vazio;
+        $("vazio").hidden = !vazio;
+        $("avisoLista").hidden = vazio || resultadoBusca !== null;
+        $("filtroAtivo").hidden = resultadoBusca === null;
+        if (resultadoBusca) $("filtroTexto").textContent = `Exibindo o resultado da busca por “${resultadoBusca.termo}”.`;
+    }
+
+    function botaoAcao(icone, classe, rotulo, aoClicar, desabilitado = false) {
+        const b = el("button", `icon-btn ${classe}`);
+        b.type = "button";
+        b.title = rotulo;
+        b.disabled = desabilitado;
+        b.setAttribute("aria-label", rotulo);
+        b.innerHTML = `<svg class="icon"><use href="#${icone}"/></svg>`;
+        b.addEventListener("click", aoClicar);
+        return b;
+    }
+
+    /* ===================== Modais e formulário ===================== */
+    function abrirNovo() {
+        produtoEmEdicao = null;
+        $("formProduto").reset();
+        limparErrosFormulario();
+        $("modalProdutoTitulo").textContent = "Novo produto";
+        $("campoId").hidden = true;
+        $("modalProduto").showModal();
+        $("produtoDescricao").focus();
+    }
+
+    function abrirEdicao(p) {
+        produtoEmEdicao = p;
+        $("formProduto").reset();
+        limparErrosFormulario();
+        $("modalProdutoTitulo").textContent = "Editar produto";
+        $("campoId").hidden = false;
+        $("produtoId").value = p.id;
+        $("produtoDescricao").value = p.descricao ?? "";
+        $("produtoPreco").value = p.preco ?? "";
+        $("modalProduto").showModal();
+        $("produtoDescricao").focus();
+    }
+
+    function abrirExclusao(p) {
+        produtoParaExcluir = p;
+        $("excluirDescricao").textContent = p.descricao ?? "este produto";
+        $("erroExcluir").hidden = true;
+        $("modalExcluir").showModal();
+    }
+
+    function validarFormulario(descricao, preco) {
+        let valido = true;
+        if (descricao.length < 2) {
+            definirErroCampo("campoDescricao", "erroDescricao", "Informe a descrição do produto (mínimo 2 caracteres).");
+            valido = false;
+        }
+        if (!Number.isFinite(preco) || preco < 0) {
+            definirErroCampo("campoPreco", "erroPreco", "Informe um preço válido (zero ou maior).");
+            valido = false;
+        }
+        return valido;
+    }
+
+    function definirErroCampo(idCampo, idErro, mensagem) {
+        $(idCampo).classList.add("invalido");
+        $(idErro).textContent = mensagem;
+    }
+
+    function limparErrosFormulario() {
+        ["campoDescricao", "campoPreco"].forEach((id) => $(id).classList.remove("invalido"));
+        ["erroDescricao", "erroPreco"].forEach((id) => { $(id).textContent = ""; });
+        $("erroProduto").hidden = true;
+    }
+
+    function mostrarErro(idElemento, mensagem) {
+        const e = $(idElemento);
+        e.textContent = mensagem;
+        e.hidden = false;
+    }
+
+    /* ===================== Avisos, status e console ===================== */
+    function toast(mensagem, tipo = "sucesso") {
+        const t = el("div", `toast toast-${tipo}`, mensagem);
+        $("toasts").appendChild(t);
+        setTimeout(() => {
+            t.classList.add("saindo");
+            setTimeout(() => t.remove(), 250);
+        }, 3500);
+    }
+
+    function definirStatusApi(online) {
+        $("statusApi").dataset.estado = online ? "online" : "offline";
+        $("statusApiTexto").textContent = online ? "Servidor conectado" : "Servidor sem resposta";
+    }
+
+    function registrarLog(metodo, url, corpo, status, ms) {
+        historico.unshift({ metodo, url, corpo, status, ms, hora: new Date() });
+        if (historico.length > 15) historico.pop();
+        renderizarLog();
+    }
+
+    function renderizarLog() {
+        const lista = $("logLista");
+        lista.replaceChildren();
+        $("logVazio").hidden = historico.length > 0;
+        historico.forEach((h) => {
+            const li = el("li");
+            const linha = el("div", "log-linha");
+            const classeStatus = h.status > 0 && h.status < 400 ? "ok" : "erro";
+            linha.append(
+                el("span", "log-hora", h.hora.toLocaleTimeString("pt-BR")),
+                el("span", `metodo metodo-${h.metodo.toLowerCase()}`, h.metodo),
+                el("code", "log-url", h.url),
+                el("span", `log-status ${classeStatus}`, h.status === 0 ? "sem resposta" : String(h.status)),
+                el("span", "log-ms", `${h.ms} ms`)
+            );
+            li.appendChild(linha);
+            if (h.corpo) li.appendChild(el("pre", "log-corpo", h.corpo));
+            lista.appendChild(li);
+        });
+    }
+
+    /* ===================== Eventos ===================== */
+    $("btnNovo").addEventListener("click", abrirNovo);
+    $("formBusca").addEventListener("submit", buscarPorDescricao);
+    $("btnLimparFiltro").addEventListener("click", () => {
+        $("buscarDescricao").value = "";
+        resultadoBusca = null;
+        renderizar();
+    });
+    $("formProduto").addEventListener("submit", salvarProduto);
+    $("btnConfirmarExcluir").addEventListener("click", confirmarExclusao);
+    $("btnLimparLog").addEventListener("click", () => { historico.length = 0; renderizarLog(); });
+
+    document.querySelectorAll("[data-fechar]").forEach((botao) => {
+        botao.addEventListener("click", () => botao.closest("dialog").close());
+    });
+    document.querySelectorAll("dialog").forEach((dialogo) => {
+        // clicar fora da caixa (no fundo escurecido) fecha o modal
+        dialogo.addEventListener("click", (e) => { if (e.target === dialogo) dialogo.close(); });
+    });
+
+    /* ===================== Início ===================== */
+    renderizarLog();
+    renderizar();
 </script>
 </body>
 </html>
