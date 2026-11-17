@@ -112,6 +112,7 @@
                     <tr>
                         <th scope="col">ID</th>
                         <th scope="col">Descrição</th>
+                        <th scope="col">Categoria</th>
                         <th scope="col" class="col-preco">Preço</th>
                         <th scope="col" class="col-acoes">Ações</th>
                     </tr>
@@ -156,6 +157,11 @@
                 <input id="produtoDescricao" type="text" maxlength="100" placeholder="Ex.: Teclado mecânico" autocomplete="off">
                 <small class="erro" id="erroDescricao"></small>
             </div>
+            <div class="campo" id="campoCategoria">
+                <label for="produtoCategoria">Categoria</label>
+                <input id="produtoCategoria" type="text" maxlength="60" placeholder="Ex.: Periféricos" autocomplete="off">
+                <small class="erro" id="erroCategoria"></small>
+            </div>
             <div class="campo" id="campoPreco">
                 <label for="produtoPreco">Preço (R$)</label>
                 <input id="produtoPreco" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0,00">
@@ -195,10 +201,12 @@
     // Endereço do recurso no backend Java (Spring). É um caminho relativo porque o
     // index.html é servido pelo próprio backend (mesma origem), sem problema de CORS.
     //
+    // Produto (entidade do backend): { id, descricao (única), categoria, preco }
+    //
     // Endpoints do ProdutoController:
-    //   POST   /produto                 -> cadastra (corpo JSON do produto)
+    //   POST   /produto                 -> cadastra (corpo JSON: descricao, categoria e preco)
     //   GET    /produto?descricao=X     -> busca um produto pela descrição
-    //   PUT    /produto?id=N            -> atualiza (corpo JSON); o ID só é usado aqui
+    //   PUT    /produto?id=N            -> atualiza (corpo JSON: descricao, categoria e preco); o ID só é usado aqui
     //   DELETE /produto?descricao=X     -> exclui pela descrição
     const API = "/produto";
     const MSG_SEM_SERVIDOR = "Sem resposta do servidor. Verifique se o backend Java está rodando.";
@@ -253,7 +261,7 @@
             return { ok: false, status: 0, dados: null };
         }
     }
-
+0
     // Extrai o produto de uma resposta de GET (resposta vazia ou erro = não encontrado)
     function extrairProduto(r) {
         if (!r.ok || !r.dados || typeof r.dados !== "object") return null;
@@ -282,17 +290,18 @@
         }
     }
 
-    // POST /produto        (cria)      corpo: { descricao, preco }
-    // PUT  /produto?id=N   (atualiza)  corpo: { descricao, preco }
+    // POST /produto        (cria)      corpo: { descricao, categoria, preco }
+    // PUT  /produto?id=N   (atualiza)  corpo: { descricao, categoria, preco }
     async function salvarProduto(evento) {
         evento.preventDefault();
         limparErrosFormulario();
         const descricao = $("produtoDescricao").value.trim();
+        const categoria = $("produtoCategoria").value.trim();
         const preco = parseFloat($("produtoPreco").value);
-        if (!validarFormulario(descricao, preco)) return;
+        if (!validarFormulario(descricao, categoria, preco)) return;
 
         const editando = produtoEmEdicao !== null;
-        const dados = { descricao, preco };
+        const dados = { descricao, categoria, preco };
         const metodo = editando ? "PUT" : "POST";
         const url = editando ? `${API}?id=${encodeURIComponent(produtoEmEdicao.id)}` : API;
 
@@ -300,7 +309,11 @@
         try {
             const r = await requisicao(metodo, url, dados);
             if (r.status === 0) return mostrarErro("erroProduto", MSG_SEM_SERVIDOR);
-            if (!r.ok) return mostrarErro("erroProduto", editando ? "Erro ao atualizar o produto." : "Erro ao cadastrar o produto.");
+            if (!r.ok) {
+                // A descrição é única no banco: duplicada, o backend recusa a gravação
+                const falha = editando ? "Erro ao atualizar o produto." : "Erro ao cadastrar o produto.";
+                return mostrarErro("erroProduto", `${falha} Verifique se a descrição já está em uso por outro produto (ela deve ser única).`);
+            }
 
             if (editando) {
                 // O PUT responde 200 sem corpo: atualizamos a linha com o que foi enviado
@@ -385,6 +398,10 @@
             tdId.appendChild(el("span", "badge-id", temId(p) ? `#${p.id}` : "—"));
 
             const tdDescricao = el("td", "col-nome", p.descricao ?? "—");
+            const tdCategoria = el("td");
+            tdCategoria.appendChild(p.categoria
+                ? el("span", "badge-cat", p.categoria)
+                : el("span", "sem-categoria", "—"));
             const tdPreco = el("td", "col-preco", formatarPreco(p.preco));
 
             const tdAcoes = el("td", "col-acoes");
@@ -397,7 +414,7 @@
             );
             tdAcoes.appendChild(grupo);
 
-            tr.append(tdId, tdDescricao, tdPreco, tdAcoes);
+            tr.append(tdId, tdDescricao, tdCategoria, tdPreco, tdAcoes);
             corpo.appendChild(tr);
         });
 
@@ -446,6 +463,7 @@
         $("campoId").hidden = false;
         $("produtoId").value = p.id;
         $("produtoDescricao").value = p.descricao ?? "";
+        $("produtoCategoria").value = p.categoria ?? "";
         $("produtoPreco").value = p.preco ?? "";
         $("modalProduto").showModal();
         $("produtoDescricao").focus();
@@ -458,10 +476,14 @@
         $("modalExcluir").showModal();
     }
 
-    function validarFormulario(descricao, preco) {
+    function validarFormulario(descricao, categoria, preco) {
         let valido = true;
         if (descricao.length < 2) {
             definirErroCampo("campoDescricao", "erroDescricao", "Informe a descrição do produto (mínimo 2 caracteres).");
+            valido = false;
+        }
+        if (categoria.length < 2) {
+            definirErroCampo("campoCategoria", "erroCategoria", "Informe a categoria do produto (mínimo 2 caracteres).");
             valido = false;
         }
         if (!Number.isFinite(preco) || preco < 0) {
@@ -477,8 +499,8 @@
     }
 
     function limparErrosFormulario() {
-        ["campoDescricao", "campoPreco"].forEach((id) => $(id).classList.remove("invalido"));
-        ["erroDescricao", "erroPreco"].forEach((id) => { $(id).textContent = ""; });
+        ["campoDescricao", "campoCategoria", "campoPreco"].forEach((id) => $(id).classList.remove("invalido"));
+        ["erroDescricao", "erroCategoria", "erroPreco"].forEach((id) => { $(id).textContent = ""; });
         $("erroProduto").hidden = true;
     }
 
